@@ -1,0 +1,18 @@
+First we defined config file
+Constant file to defined the all variables
+Config entity and artifact entity
+Configuration file
+Utils file to call helper function
+Data Ingestion/validation and so on...
+define pipeline and run demo/app.py file.
+
+1-Data ingestion
+[config.yaml>>constant.init>>config_entity and artifact_entity>>configurations.py>>utils>>data_ingestion.py>>training_pipeline.py>>demo.py>>main.py]
+we are able to download the data from github, push the data in the db, fetch the data from db,split the data into train and test
+push train and test data into our db.
+
+2-Data vaidation
+[config.yaml>>constant.init>>config_entity and artifact_entity>>configurations.py>>utils>>data_validation.py>>training_pipeline.py>>demo.py>>main.py]
+existing data complete raw data-> we can validate our new data based upon existing main data file 
+matching the columns of new data with the columns name defined in schema file and check complete missing values in new data
+existing train and test data-> we can validate our new data based upon existing data if not available then create train and test data
