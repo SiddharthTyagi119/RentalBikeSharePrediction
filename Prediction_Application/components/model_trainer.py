@@ -26,17 +26,20 @@ class ModelTrainer:
         except Exception as e:
             raise ApplicationException(e,sys) from e
 
-    
+#hyperparameter tuning
     def get_random_forest_best_params(self, x_train,y_train)->dict:
         try:
             logging.info("Grid Search for Random forest best parameters started")
             rf = RandomForestRegressor(n_estimators=100, criterion='squared_error',random_state=786)
+            #parameters
             param_grid = {"n_estimators" : [50,100,150,200],
               "max_depth" : [2,3,4,5,6,7,8,9],
               "min_samples_split" : [2,4,5,6,10]}
+            #grid search 
             grid_rf = GridSearchCV(estimator=rf, param_grid=param_grid, cv=5, scoring="r2")
             grid_rf.fit(x_train, y_train)
             logging.info("Grid Search for Random forest best parameters completed")
+            #it will return best params for random forest
             return grid_rf.best_params_
         except Exception as e:
             raise ApplicationException(e,sys) from e
@@ -44,6 +47,7 @@ class ModelTrainer:
     def get_xgboost_best_params(self,x_train,y_train,x_test,y_test)->dict:
         try:
             logging.info("Optuna Search for XG Boost best parameters started")
+            #defining all the params 
             def objective(trial, data=x_train, target=y_train):
                 param = {
                 #'tree_method' : 'gpu_hist',
@@ -82,7 +86,7 @@ class ModelTrainer:
             return self.get_xgboost_best_params(x_train,y_train,x_test,y_test)
         except Exception as e:
             raise ApplicationException(e,sys) from e
-
+#creating model
     def Random_Forest_Regressor(self,x_train,y_train):
         try:
             logging.info("Getting Best Parameters for Random Forest by Grid Search CV")

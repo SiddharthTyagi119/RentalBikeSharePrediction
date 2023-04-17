@@ -1,4 +1,4 @@
-#for batch prediction
+#for batch prediction and single prediction
 from tkinter import E
 from Prediction_Application.components.data_validation import Prediction_Validation
 from Prediction_Application.config.configuration import Configuration

@@ -19,8 +19,8 @@ existing train and test data-> we can validate our new data based upon existing 
 
 
 3-Data transformation
-[schema.yaml>>config.yaml>>constant.init>>config_entity and artifact_entity>>configurations.py>>utils>>data_transformation.py>>training_pipeline.py>>demo.py>>main.py]
+[config.yaml>>constant.init>>config_entity and artifact_entity>>configurations.py>>utils>>data_transformation.py>>training_pipeline.py>>demo.py>>main.py]
 
 4-Data Trainer
-
+[config.yaml>>constant.init>>config_entity and artifact_entity>>configurations.py>>utils>>model_trainer.py>>training_pipeline.py>>demo.py>>main.py]
 
