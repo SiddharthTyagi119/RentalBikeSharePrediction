@@ -1,3 +1,4 @@
+#this validation will help us during batch prediction when we upload the new data
 from Prediction_Application.logger import logging
 from Prediction_Application.exception import ApplicationException
 from Prediction_Application.entity.config_entity import DataValidationConfig, DataIngestionConfig
@@ -22,6 +23,7 @@ class Prediction_Validation:
         except Exception as e:
             raise ApplicationException(e,sys) from e
 
+#function to check file name 
     def file_name_check(self,file):
         try:
             file_check_status = False
@@ -29,7 +31,9 @@ class Prediction_Validation:
             length_date_stamp = self.dataset_schema["LengthOfDateStampInFile"]
             length_time_stamp = self.dataset_schema["LengthOfTimeStampInFile"]
             
+            #format of the main file
             regex = "Rental_Bike_Share_Data[\_][\d]+[\_][\d]+\.csv"
+
             if (re.match(regex,file)):
                 splitAtDot = re.split(".csv",file)
                 splitAtDot = re.split("_",splitAtDot[0])
@@ -46,6 +50,8 @@ class Prediction_Validation:
         
     def column_check(self,file):   
         try:
+            #validating columns
+            #reading the data 
             data = pd.read_csv(file)
             # Finding no of columns in the dataset
             no_of_columns = data.shape[1]
@@ -60,10 +66,12 @@ class Prediction_Validation:
                 if column not in self.dataset_schema["Columns"].keys():
                     raise Exception(f"Column :[{column}] in file: [{file}] not available in the Schema!!!")
 
+             
             # Checking whether any column have entire rows as missing value
             count = 0
             col = []
-            for column in columns:            
+            for column in columns:  
+                #checking the columns is empty or not           
                 if (len(data[column]) - data[column].count()) == len(data[column]):
                     count+=1
                     col.append(column)
@@ -93,6 +101,7 @@ class Prediction_Validation:
     def __del__(self):
         logging.info("Prediction Dataset Validation log complete")
 
+#main class in which we will apply the above function on our data to validate
 class DataValidation:
     def __init__(self, data_validation_config : DataValidationConfig,
                     data_ingestion_config : DataIngestionConfig, 
@@ -106,15 +115,17 @@ class DataValidation:
             self.dataset_schema = read_yaml_file(file_path=self.schema_file_path)
         except Exception as e:
             raise ApplicationException(e,sys) from e
-
+#existing data 
     def get_train_test_df(self):
         try:
+            #reading the existing   data
             train_df = pd.read_csv(self.data_ingestion_artifact.train_file_path)
             test_df = pd.read_csv(self.data_ingestion_artifact.test_file_path)
             return train_df,test_df
         except Exception as e:
             raise ApplicationException(e,sys) from e
 
+#existence of existing data
     def is_train_test_file_exists(self)->bool:
         try: 
             logging.info("Checking if the training and test file is available")
@@ -131,6 +142,7 @@ class DataValidation:
 
             logging.info(f"Is train and test file exists?-> {is_available}")
 
+            #if not available then create train and test file
             if not is_available:
                 training_file = self.data_ingestion_artifact.train_file_path
                 testing_file = self.data_ingestion_artifact.test_file_path

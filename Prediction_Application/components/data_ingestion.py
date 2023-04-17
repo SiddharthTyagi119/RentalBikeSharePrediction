@@ -36,6 +36,7 @@ class DataIngestion:
             # folder location to download zipped file
             tgz_download_dir = self.data_ingestion_config.tgz_download_dir
 
+            #checking tgz dir.
             if os.path.exists(tgz_download_dir):
                 os.remove(tgz_download_dir)
             os.makedirs(tgz_download_dir,exist_ok=True)
@@ -44,6 +45,7 @@ class DataIngestion:
             file_name = "rental_bike_data.zip"
             tgz_file_path = os.path.join(tgz_download_dir,file_name)
 
+            #downloading the complete data
             logging.info(f"Downloading file from: [{download_url}] into : [{tgz_file_path}]")
             urllib.request.urlretrieve(download_url,tgz_file_path)
             logging.info(f"File: [{tgz_file_path}] has been downloaded successfully")
@@ -57,10 +59,12 @@ class DataIngestion:
         try:
             # Folder location to extract the downloaded zipped dataset files
             raw_data_dir = self.data_ingestion_config.raw_data_dir
+            #checking the existence of raw data directory
             if os.path.exists(raw_data_dir):
                 os.remove(raw_data_dir)
             os.makedirs(raw_data_dir,exist_ok=True)
 
+            #extracting the folder
             logging.info(f"Extracting zipped file : [{tgz_file_path}] into dir: [{raw_data_dir}]")
             # Extarcting the files from zipped file
             zip_ref = zipfile.ZipFile(tgz_file_path)
@@ -74,7 +78,8 @@ class DataIngestion:
 
     def data_merge_and_split(self):
         try:
-            raw_data_dir = self.data_ingestion_config.raw_data_dir  # Location for extracted data files
+            # Location for extracted data file
+            raw_data_dir = self.data_ingestion_config.raw_data_dir  
             
             file_name = os.listdir(raw_data_dir)[0]
             data_file_path = os.path.join(raw_data_dir,file_name)
@@ -83,10 +88,14 @@ class DataIngestion:
             self.db.create_and_check_collection()
             
             # Reading each data files and dumping it into DB
+            #checking data file path 
             for file in os.listdir(data_file_path):
+                #reading the data
                 data = pd.read_csv(os.path.join(data_file_path,file))
+                #converting the data into dict
                 data_dict = data.to_dict("records")
                 logging.info(f"Inserting file: [{file}] into DB")
+                #inserting the data into db
                 self.db.insertall(data_dict)
 
             # fetching the data set from DB

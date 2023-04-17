@@ -2,6 +2,7 @@ training_pipeline_config:
   pipeline_name: rental_bike_demand
   artifact_dir: artifact
 
+#downloading the data from github and storing it 
 data_ingestion_config:
   dataset_download_url : https://github.com/Shivan118/Main-Branching/blob/main/Rental%20bike%20demand%20data.zip?raw=true
   raw_data_dir: raw_data
@@ -13,8 +14,8 @@ data_ingestion_config:
 data_validation_config:
   schema_dir: config
   schema_file_name: schema.yaml
-  report_file_name: report.json
-  report_page_file_name: report.html
+  report_file_name: report.json        #data validation output in json format
+  report_page_file_name: report.html   #report in hmtl format
 
 data_transformation_config:
   tranformed_dir: transformed_data

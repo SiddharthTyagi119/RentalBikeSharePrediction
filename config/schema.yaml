@@ -1,3 +1,4 @@
+#accept the data only in below format
 SampleFileName : Rental_Bike_Share_Data_20180101_120000.csv
 LengthOfDateStampInFile : 8
 LengthOfTimeStampInFile : 6

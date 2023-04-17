@@ -50,11 +50,12 @@ TARGET_COLUMN_KEY = "target_column"
 PIKLE_FOLDER_NAME_KEY = "prediction_files"
 
 # Database related variables
-DATABASE_CLIENT_URL_KEY = "mongodb+srv://bikeintern:bikeintern@bike-application.60cxb.mongodb.net/?retryWrites=true&w=majority"
-DATABASE_NAME_KEY = "Rental_Bike_Share_DB"
-DATABASE_COLLECTION_NAME_KEY = "Bike_Data"
-DATABASE_TRAINING_COLLECTION_NAME_KEY = "Training"
-DATABASE_TEST_COLLECTION_NAME_KEY = "Test"
+#using mondo db database
+DATABASE_CLIENT_URL_KEY = "mongodb+srv://sidtyagi05:Corona#12#@cluster0.9hfbo47.mongodb.net/?retryWrites=true&w=majority"
+DATABASE_NAME_KEY = "Rental_Bike_Share_DB"    #database
+DATABASE_COLLECTION_NAME_KEY = "Bike_Data"    #collection
+DATABASE_TRAINING_COLLECTION_NAME_KEY = "Training"    #training data
+DATABASE_TEST_COLLECTION_NAME_KEY = "Test"            #testing data
 
 # Model Training related variables
 MODEL_TRAINER_CONFIG_KEY = "model_trainer_config"

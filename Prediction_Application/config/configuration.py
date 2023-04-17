@@ -20,13 +20,17 @@ class Configuration:
             artifact_dir = self.training_pipeline_config.artifact_dir
             data_ingestion_artifact_dir = os.path.join(artifact_dir,DATA_INGESTION_ARTIFACT_DIR,self.time_stamp)
 
+            #calling all the variables from config.yaml through constant
             data_ingestion_info = self.config_info[DATA_INGESTION_CONFIG_KEY]
 
+            #download the data
             dataset_download_url = data_ingestion_info[DATA_INGESTION_DOWNLOAD_URL_KEY]
 
+            #save in tgz foramat dir
             tgz_download_dir = os.path.join(data_ingestion_artifact_dir,
                                             data_ingestion_info[DATA_INGESTION_TGZ_DOWNLOAD_DIR_KEY])
 
+            #raw data dir
             raw_data_dir = os.path.join(data_ingestion_artifact_dir,
                                             data_ingestion_info[DATA_INGESTION_RAW_DATA_DIR_KEY])
 
@@ -57,13 +61,14 @@ class Configuration:
 
             data_validation_config = self.config_info[DATA_VALIDATION_CONFIG_KEY]
 
+            #joining schema directory and schema file name
             schema_file_path = os.path.join(ROOT_DIR,
                                             data_validation_config[DATA_VALIDATION_SCHEMA_DIR_KEY],
                                             data_validation_config[DATA_VALIDATION_SCHEMA_FILE_NAME_KEY])
-
+            #this is for json
             report_file_path = os.path.join(data_validation_artifact_dir,
                                             data_validation_config[DATA_VALIDATION_REPORT_FILE_NAME_KEY])
-
+            #this is for html file
             report_page_file_path = os.path.join(data_validation_artifact_dir,
                                             data_validation_config[DATA_VALIDATION_REPORT_PAGE_FILE_NAME_KEY])
 
