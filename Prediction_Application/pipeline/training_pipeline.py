@@ -30,6 +30,8 @@ class Training_Pipeline:
         except Exception as e:
             raise ApplicationException(e,sys) from e
 
+#calling data_ingestion artifact because we need ingested data first so that we can validate the new data with
+#the existing data
     def start_data_validation(self, data_ingestion_config:DataIngestionConfig,
                                     data_ingestion_artifact:DataIngestionArtifact)->DataValidationArtifact:
         try:
@@ -43,7 +45,7 @@ class Training_Pipeline:
 # We are handling outliers, Handling Imblanced Data, Handling Missing values, Data Distribution, Checking Duplicated,
 # Do the Encdoing, Scaling, 
 # -> We need data -> Data Ingestion Artifact -> We need to validate to perfrom data transfromation operation
-   
+#data transformation artifact to store the transformed data 
     def start_data_transformation(self,data_ingestion_artifact: DataIngestionArtifact,
                                        data_validation_artifact: DataValidationArtifact) -> DataTransformationArtifact:
         try:
@@ -56,7 +58,7 @@ class Training_Pipeline:
         except Exception as e:
             raise ApplicationException(e,sys) from e
 
-
+#calling data transformation artifact to ge transformed data for model building
     def start_model_training(self,data_transformation_artifact: DataTransformationArtifact) -> ModelTrainerArtifact:
         try:
             model_trainer = ModelTrainer(model_trainer_config=self.config.get_model_trainer_config(),

@@ -39,11 +39,11 @@ class Prediction:
         """
         try:
             logging.info(f"{'*'*20}Bulk Prediction Mode Selected {'*'*20}")
-            # Getting location of uploaded dataset
+            # Getting location of uploaded dataset, location to store the output 
             self.folder = PREDICTION_DATA_SAVING_FOLDER_KEY
             self.path = os.path.join(self.folder,os.listdir(self.folder)[0])
             
-            # Validating uploaded dataset
+            # Validating uploaded dataset based on schema file
             logging.info(f"Validatiog Passed Dataset : [{self.path}]")
             pred_val = Prediction_Validation(self.path,self.data_validation_config)
             data_validation_status = pred_val.validate_dataset_schema()
@@ -51,18 +51,24 @@ class Prediction:
             logging.info(f"Prediction for dataset: [{self.path}]")
 
             if data_validation_status:
-                # Reading uploaded .CSV file in pandas
+                # Reading uploaded .CSV file in pandas 
+
                 data_df = pd.read_csv(self.path)
+                #target data
                 data_df['total_count'] = 0
+                #features
                 col = ['date','year','month','hour','season','weekday','is_holiday','working_day','total_count',
                     'temp','wind','humidity','weather_sit','is_covid']
                 
                 logging.info("Feature Engineering applied !!!")
+                #applying featue engineering on input features
                 featured_eng_data = pd.DataFrame(self.fe_obj.transform(data_df),columns=col)
                 featured_eng_data.drop(columns="total_count", inplace=True)
                 
+                #date columns
                 date_cols = featured_eng_data.loc[:,['date','year','month','hour']]
 
+                #checking for any duplicate column if present then drop it
                 cols = ['date','year','month','hour','season','weekday','is_holiday','working_day','weather_sit',
                 'is_covid','temp','wind','humidity']
                 data_df = data_df[~data_df.duplicated(subset=["date","month","hour"],keep='last')]
@@ -70,30 +76,38 @@ class Prediction:
 
                 logging.info("Data Preprocessing Done!!!")
                 # Applying preprocessing object on the data
+                #doing scaling on date column  
                 transformed_data = pd.DataFrame(np.c_[date_cols,self.preprocessing_obj.transform(featured_eng_data)],columns=cols)
                 
                 transformed_data.drop(columns=["year"], inplace=True)
+                #setting the date column as  index
                 transformed_data.set_index("date",inplace=True)
 
 # ['date','year','month','hour'] -> object -> Datetime
 
                 # Convertng datatype of feature accordingly
+                #converting into correct format
                 transformed_data=transformed_data.infer_objects() 
 
                 # Predicting from the saved model object
+                #saving the complete prediction
                 prediction = self.model_obj.predict(transformed_data)
                 data_df["predicted_demand"] = prediction
                 logging.info("Prediction from model done")
 
                 logging.info("Saving prediction file for sending it to the user")
 
+                #going to save the prediction file under output folder
                 output_folder_file_path = os.path.join(ROOT_DIR,"Output Folder",CURRENT_TIME_STAMP,"Predicted.csv")
+                #if path exist then join the path with output folder and then create the folder
                 if os.path.exists(os.path.join(ROOT_DIR,"Output Folder")):
                     shutil.rmtree(os.path.join(ROOT_DIR,"Output Folder"))
 
                 save_data(file_path=output_folder_file_path,data = data_df)
                 zipped_file = os.path.dirname(output_folder_file_path)
                 
+
+                #automatically during batch prediction, existing output will get deleted and newly willbe stored
                 shutil.make_archive(zipped_file,"zip",zipped_file)
                 shutil.rmtree(zipped_file)
                 shutil.rmtree(self.folder)
@@ -117,14 +131,16 @@ class Prediction:
             date_cols = df.loc[:,["date","month","hour"]]
 
             # Applying preprocessing object on the data
+            #scaling the data of data_cols
             preprocessed_df = pd.DataFrame(np.c_[date_cols,self.preprocessing_obj.transform(df.drop(columns=["date","month","hour"]))],
             columns=df.columns)
+            #setting the date as index
             preprocessed_df.set_index("date",inplace=True)
 
             # Changing datatype of features accordingly
             preprocessed_df = preprocessed_df.infer_objects()
 
-            # Predicting from the saved model
+            # Predicting from the saved data
             prediction = self.model_obj.predict(preprocessed_df)
             logging.info(f"{'*'*20} Single Prediction Complete {'*'*20}")
             return round(prediction[0]) #234.56789
