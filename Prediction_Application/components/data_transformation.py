@@ -27,9 +27,9 @@ class Feature_Engineering(BaseEstimator, TransformerMixin):
         """
         logging.info(f"\n{'*'*20} Feature Engneering Started {'*'*20}\n\n")
         
-        
+ # cleaning of wind column      
     def wind_clean(self,x):
-        pat = "[\d]+" # a-z ( clim1,2, clim )
+        pat = "[\d]+" # a-z ( clim1,2, clim ) #apart from text data remove everything 
         if x=="Calm":
             num = 0
         elif x!= " " and "°" in x:
@@ -42,10 +42,12 @@ class Feature_Engineering(BaseEstimator, TransformerMixin):
         """
         Function to return a string with words mentioned in conditions list below.
         """
+       #if these functions available in data then put these in an empty list
         conditions = ["Clear", "Cloudy","Broken","Few","Scattered","Haze","Fog","Drizzle",
                       "Snowfall","Light","Rain","Thunderstorm","Heavy"] # clear, cloudy
         desc = []
         if x != np.nan:    
+            #if data is present without comma then split the data add comma and append it in the list
             for i in str(x).split():
                 if i in conditions:
                     desc.append(i)
@@ -78,7 +80,9 @@ class Feature_Engineering(BaseEstimator, TransformerMixin):
             data["casual"] = data["casual"].astype("int64")
             data["member"] = data["member"].astype("int64")
             
+            #converting data column into two date time format
             data["date"] = pd.to_datetime(data["date"])
+            #sort the data in date and hr
             data.sort_values(by=['date', "hour"], ascending=True, inplace=True)
             
             # Removing the duplicate rows from dataset
@@ -93,12 +97,16 @@ class Feature_Engineering(BaseEstimator, TransformerMixin):
         """
         Function to clean weather description column and label encode it.
         """
+        #if these are available in descryption column then assign 1 to these
         if ("Few" in x) or ("Clear" in x) or ("Drizzle" in x) :
             return int(1)
+        #if these are available in descryption column then assign 2 to these
         elif ("Broken" in x) or ("Haze" in x) or ("Cloudy" in x):
             return int(2)
+        #if these are available in descryption column then assign 3 to these
         elif ("Light Rain" in x) or ("Snowfall" in x) or ("Scattered" in x):
             return int(3)
+        #if these are available in descryption column then assign 4 to these
         elif ("Heavy" in x) or ("Thunderstorm" in x) or ("Fog" in x):
             return int(4)
     
@@ -158,16 +166,20 @@ class DataTransformation:
 
     def get_data_transformer_object(self):
         try:
+            #schema file path
             schema_file_path = self.data_validation_artifact.schema_file_path
-
+            
+            #schema
             dataset_schema = read_yaml_file(file_path=schema_file_path)
 
+            #calling all types of columns
             date_columns = dataset_schema[DATE_COLUMN_KEY]
             numerical_columns = dataset_schema[NUMERICAL_COLUMN_KEY] 
             categorical_columns = dataset_schema[CATEGORICAL_COLUMN_KEY]
 
             all_columns = date_columns+numerical_columns+categorical_columns
 
+            #column transformer pipeline
             num_pipeline = Pipeline(steps =[("impute", SimpleImputer(strategy="median")),
                                             ("scaler",StandardScaler())])
 
@@ -184,10 +196,12 @@ class DataTransformation:
     
     def initiate_data_transformation(self):
         try:
+            #train and test file
             logging.info(f"Obtaining training and test file path.")
             train_file_path = self.data_ingestion_artifact.train_file_path
             test_file_path = self.data_ingestion_artifact.test_file_path
 
+            #train and test data
             logging.info(f"Loading training and test data as pandas dataframe.")
             train_df = pd.read_csv(train_file_path)
             test_df = pd.read_csv(test_file_path)
@@ -203,7 +217,8 @@ class DataTransformation:
 
             logging.info(f"Obtaining feature engineering object.")
             fe_obj = self.get_feature_engineering_object()
-
+ 
+            #date,numerical and categorical column
             date_columns = schema[DATE_COLUMN_KEY]
             numerical_columns = schema[NUMERICAL_COLUMN_KEY] 
             categorical_columns = schema[CATEGORICAL_COLUMN_KEY]
@@ -241,12 +256,15 @@ class DataTransformation:
             transformed_train_df = pd.DataFrame(np.c_[date_col_train_df,train_arr,np.array(target_feature_train_df)],columns=all_columns+[target_column_name])
             transformed_test_df = pd.DataFrame(np.c_[date_col_test_df,test_arr,np.array(target_feature_test_df)],columns=all_columns+[target_column_name])
 
+            #taking data_transformation config for train and test data
             transformed_train_dir = self.data_transformation_config.transformed_train_dir
             transformed_test_dir = self.data_transformation_config.transformed_test_dir
 
+            #transformed train and test data path
             transformed_train_file_path = os.path.join(transformed_train_dir,"transformed_train.csv")
             transformed_test_file_path = os.path.join(transformed_test_dir,"transformed_test.csv")
 
+            #saving transformed train and test data
             save_data(file_path = transformed_train_file_path, data = transformed_train_df)
             save_data(file_path = transformed_test_file_path, data = transformed_test_df)
 
@@ -262,6 +280,7 @@ class DataTransformation:
             save_object(file_path=os.path.join(ROOT_DIR,PIKLE_FOLDER_NAME_KEY,
                                  os.path.basename(preprocessing_object_file_path)),obj=preprocessing_obj)
 
+            #make artifact
             data_transformation_artifact = DataTransformationArtifact(is_transformed=True,
             message="Data transformation successfull.",
             transformed_train_file_path = transformed_train_file_path,
