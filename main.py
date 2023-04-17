@@ -22,19 +22,23 @@ def home():
 @cross_origin()
 def bulk_predict():
     try:
+        #uploading the  data file
         file = request.files.get("files")
         folder = PREDICTION_DATA_SAVING_FOLDER_KEY
 
         flash("File uploaded!!","success")
 
+        #if o/p file available then delete it and create a new one
         if os.path.isdir(folder):
             shutil.rmtree(folder)
         os.mkdir(folder)
 
         file.save(os.path.join(folder,file.filename))
 
+        #calling prediction class and initiate bulk prediction
         pred = Prediction()
         output_file = pred.initiate_bulk_prediction()
+        #saving the o/p
         path = os.path.basename(output_file)
 
         flash("Prediction File generated!!","success")
@@ -49,6 +53,7 @@ def bulk_predict():
 @cross_origin()
 def single_predict():
     try:   
+        #mapping the variables
         data = {'date': request.form['date'],
                 'month': int(request.form['month']),
                 'hour': int(request.form['hour']),
@@ -62,8 +67,10 @@ def single_predict():
                 'wind': float(request.form['wind']),
                 'humidity': float(request.form['humidity'])}
 
+        #calling the prediction class and initiating single prediction
         pred = Prediction()
         output = pred.initiate_single_prediction(data)
+        #getting the output
         flash(f"Predicted Demand for Bike for given conditions: {output}","success")
         return redirect(url_for('home'))
     except Exception as e:
